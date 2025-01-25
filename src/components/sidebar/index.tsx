@@ -14,6 +14,7 @@ import {
   ShoppingBag,
   User,
   Zap,
+  SunMoon,
 } from "lucide-react";
 import {
   TooltipProvider,
@@ -21,8 +22,24 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "../ui/tooltip";
+import { useTheme } from "next-themes";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 export function Sidebar() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+  };
+
   return (
     <div className="flex w-full flex-col bg-muted/40">
       {/* SIDEBAR DESKTOP */}
@@ -30,8 +47,8 @@ export function Sidebar() {
         <nav className="flex flex-col items-center gap-4 px-2 py-5">
           <TooltipProvider>
             <Link
-              href="/"
-              className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#101010] text-primary-foreground rounded-full"
+              href="#"
+              className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#101010] text-primary-foreground rounded-full cursor-default"
             >
               <Zap className="h-4 w-4" color="#f4af0c" fill="#f4af0c" />
               <span className="sr-only">Dashboard avatar</span>
@@ -92,7 +109,7 @@ export function Sidebar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="#"
+                  href="/profile"
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <User className="h-4 w-4" />
@@ -123,6 +140,23 @@ export function Sidebar() {
               <TooltipTrigger asChild>
                 <Link
                   href="#"
+                  onClick={toggleTheme}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <SunMoon className="h-4 w-4" />
+                  <span className="sr-only">Tema</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right">Tema</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="#"
+                  onClick={handleLogout}
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <LogOut className="h-4 w-4 text-red-500" />
@@ -132,6 +166,14 @@ export function Sidebar() {
               <TooltipContent side="right">Sair</TooltipContent>
             </Tooltip>
           </TooltipProvider>
+
+          {user && (
+            <>
+              <span className="text-sm text-muted-foreground">
+                {user.product}
+              </span>
+            </>
+          )}
         </nav>
       </aside>
 
@@ -198,7 +240,7 @@ export function Sidebar() {
                 </Link>
 
                 <Link
-                  href="#"
+                  href="/profile"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                   prefetch={false}
                 >
@@ -219,10 +261,29 @@ export function Sidebar() {
                   href="#"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                   prefetch={false}
+                  onClick={toggleTheme}
+                >
+                  <SunMoon className="h-5 w-5" />
+                  Sair
+                </Link>
+
+                <Link
+                  href="#"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                  prefetch={false}
+                  onClick={handleLogout}
                 >
                   <LogOut className="h-5 w-5 text-red-500" />
                   Sair
                 </Link>
+
+                {user && (
+                  <>
+                    <span className="text-sm text-muted-foreground">
+                      {user.product}
+                    </span>
+                  </>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
